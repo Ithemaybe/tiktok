@@ -7,27 +7,33 @@ let currentAudioUrl = '';
 const cache = {
   videoBlob: null,
   audioBlob: null,
+  fullMusicBlob: null,
   videoName: 'tiktok-video.mp4',
   audioName: 'tiktok-audio.mp3',
+  fullMusicName: 'tiktok-full-music.mp3',
   timer: null,
 
-  set(videoBlob, audioBlob, title) {
+  set(videoBlob, audioBlob, fullMusicBlob, title, musicTitle) {
     this.clear();
-    this.videoBlob = videoBlob;
-    this.audioBlob = audioBlob;
-    this.videoName = (title || 'tiktok-video').slice(0, 60).replace(/[^\w\s-]/g, '') + '.mp4';
-    this.audioName = (title || 'tiktok-audio').slice(0, 60).replace(/[^\w\s-]/g, '') + '.mp3';
+    this.videoBlob     = videoBlob;
+    this.audioBlob     = audioBlob;
+    this.fullMusicBlob = fullMusicBlob;
+    this.videoName     = (title || 'tiktok-video').slice(0, 60).replace(/[^\w\s-]/g, '') + '.mp4';
+    this.audioName     = (title || 'tiktok-audio').slice(0, 60).replace(/[^\w\s-]/g, '') + '.mp3';
+    this.fullMusicName = (musicTitle || title || 'tiktok-full-music').slice(0, 60).replace(/[^\w\s-]/g, '') + '.mp3';
     this.timer = setTimeout(() => this.clear(), CACHE_TTL);
   },
 
   clear() {
-    if (this.videoBlob) { URL.revokeObjectURL(this.videoBlob); this.videoBlob = null; }
-    if (this.audioBlob) { URL.revokeObjectURL(this.audioBlob); this.audioBlob = null; }
-    if (this.timer)     { clearTimeout(this.timer); this.timer = null; }
+    if (this.videoBlob)     { URL.revokeObjectURL(this.videoBlob);     this.videoBlob     = null; }
+    if (this.audioBlob)     { URL.revokeObjectURL(this.audioBlob);     this.audioBlob     = null; }
+    if (this.fullMusicBlob) { URL.revokeObjectURL(this.fullMusicBlob); this.fullMusicBlob = null; }
+    if (this.timer)         { clearTimeout(this.timer); this.timer = null; }
   },
 
-  hasVideo() { return !!this.videoBlob; },
-  hasAudio() { return !!this.audioBlob; },
+  hasVideo()     { return !!this.videoBlob; },
+  hasAudio()     { return !!this.audioBlob; },
+  hasFullMusic() { return !!this.fullMusicBlob; },
 };
 
 function isTikTokUrl(raw) {
@@ -62,32 +68,37 @@ async function fetchTikTokData(url) {
   if (json.code !== 0 || !json.data) throw new Error(json.msg || 'Видео не найдено');
 
   return {
-    title:  json.data.title  || '',
-    author: json.data.author?.unique_id || json.data.author?.nickname || '',
-    cover:  json.data.cover  || '',
-    video:  json.data.play   || json.data.wmplay || '',
-    audio:  json.data.music  || '',
+    title:     json.data.title  || '',
+    author:    json.data.author?.unique_id || json.data.author?.nickname || '',
+    cover:     json.data.cover  || '',
+    video:     json.data.play   || json.data.wmplay || '',
+    audio:     json.data.music  || '',
+    fullMusic: json.data.music_info?.play || '',
+    musicTitle: json.data.music_info?.title || json.data.music_info?.author || '',
   };
 }
 
 window.addEventListener('DOMContentLoaded', () => {
 
-  const urlInput     = document.getElementById('urlInput');
-  const pasteBtn     = document.getElementById('pasteBtn');
-  const dlBtn        = document.getElementById('dlBtn');
-  const btnText      = dlBtn.querySelector('.btn-text');
-  const spinner      = document.getElementById('spinner');
-  const errorMsg     = document.getElementById('errorMsg');
-  const resultCard   = document.getElementById('resultCard');
-  const thumbWrap    = document.getElementById('thumbWrap');
-  const resultTitle  = document.getElementById('resultTitle');
-  const resultAuthor = document.getElementById('resultAuthor');
-  const videoBtn     = document.getElementById('videoBtn');
-  const audioBtn     = document.getElementById('audioBtn');
-  const videoBtnText = document.getElementById('videoBtnText');
-  const audioBtnText = document.getElementById('audioBtnText');
-  const videoSpinner = document.getElementById('videoSpinner');
-  const audioSpinner = document.getElementById('audioSpinner');
+  const urlInput        = document.getElementById('urlInput');
+  const pasteBtn        = document.getElementById('pasteBtn');
+  const dlBtn           = document.getElementById('dlBtn');
+  const btnText         = dlBtn.querySelector('.btn-text');
+  const spinner         = document.getElementById('spinner');
+  const errorMsg        = document.getElementById('errorMsg');
+  const resultCard      = document.getElementById('resultCard');
+  const thumbWrap       = document.getElementById('thumbWrap');
+  const resultTitle     = document.getElementById('resultTitle');
+  const resultAuthor    = document.getElementById('resultAuthor');
+  const videoBtn        = document.getElementById('videoBtn');
+  const audioBtn        = document.getElementById('audioBtn');
+  const fullMusicBtn    = document.getElementById('fullMusicBtn');
+  const videoBtnText    = document.getElementById('videoBtnText');
+  const audioBtnText    = document.getElementById('audioBtnText');
+  const fullMusicBtnText = document.getElementById('fullMusicBtnText');
+  const videoSpinner    = document.getElementById('videoSpinner');
+  const audioSpinner    = document.getElementById('audioSpinner');
+  const fullMusicSpinner = document.getElementById('fullMusicSpinner');
 
   function setMainLoading(on) {
     dlBtn.disabled        = on;
@@ -125,8 +136,9 @@ window.addEventListener('DOMContentLoaded', () => {
     resultTitle.textContent  = data.title  || 'TikTok видео';
     resultAuthor.textContent = data.author ? '@' + data.author : '@unknown';
 
-    setActBtn(videoBtn, videoBtnText, videoSpinner, { enabled: cache.hasVideo() });
-    setActBtn(audioBtn, audioBtnText, audioSpinner, { enabled: cache.hasAudio() });
+    setActBtn(videoBtn,     videoBtnText,     videoSpinner,     { enabled: cache.hasVideo() });
+    setActBtn(audioBtn,     audioBtnText,     audioSpinner,     { enabled: cache.hasAudio() });
+    setActBtn(fullMusicBtn, fullMusicBtnText, fullMusicSpinner, { enabled: cache.hasFullMusic() });
 
     resultCard.classList.add('visible');
   }
@@ -158,12 +170,13 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       const data = await fetchTikTokData(raw);
 
-      const [videoBlob, audioBlob] = await Promise.all([
-        data.video ? urlToBlob(data.video) : Promise.resolve(null),
-        data.audio ? urlToBlob(data.audio) : Promise.resolve(null),
+      const [videoBlob, audioBlob, fullMusicBlob] = await Promise.all([
+        data.video     ? urlToBlob(data.video)     : Promise.resolve(null),
+        data.audio     ? urlToBlob(data.audio)     : Promise.resolve(null),
+        data.fullMusic ? urlToBlob(data.fullMusic) : Promise.resolve(null),
       ]);
 
-      cache.set(videoBlob, audioBlob, data.title);
+      cache.set(videoBlob, audioBlob, fullMusicBlob, data.title, data.musicTitle);
       showResult(data);
     } catch (err) {
       showError(
@@ -182,6 +195,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   audioBtn.addEventListener('click', () => {
     if (cache.hasAudio()) triggerSave(cache.audioBlob, cache.audioName);
+  });
+
+  fullMusicBtn.addEventListener('click', () => {
+    if (cache.hasFullMusic()) triggerSave(cache.fullMusicBlob, cache.fullMusicName);
   });
 
   dlBtn.addEventListener('click', handleDownload);

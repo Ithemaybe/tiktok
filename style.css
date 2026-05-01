@@ -378,10 +378,6 @@ body::before {
   color: var(--accent2);
 }
 
-.act-full-music svg {
-  color: #a78bfa;
-}
-
 /* Spinner inside act-btn */
 .btn-spinner {
   display: none;

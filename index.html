@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Downloader</title>
+
+  <!-- Open Graph (Telegram, VK, WhatsApp, Facebook) -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://ithemaybe.github.io/tiktok/">
+  <meta property="og:title"       content="TiktokDownloader from ithemaybe">
+  <meta property="og:description" content="TiktokDownloader from ithemaybe">
+  <meta property="og:image"       content="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale"      content="ru_RU">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:url"         content="https://ithemaybe.github.io/tiktok/">
+  <meta name="twitter:title"       content="TiktokDownloader from ithemaybe">
+  <meta name="twitter:description" content="TiktokDownloader from ithemaybe">
+  <meta name="twitter:image"       content="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.png">
+
+  <!-- General -->
+  <meta name="description" content="TiktokDownloader from ithemaybe">
+  <meta name="theme-color" content="#fe2c55">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <main class="wrap">
+
+    <div class="logo">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="38" height="38" rx="10" fill="#111"/>
+        <path d="M24.5 9h-3.8v13.3a4 4 0 1 1-4-4.1c.35 0 .7.05 1.02.13V14.4a7.7 7.7 0 1 0 6.78 7.63V14.2a9.4 9.4 0 0 0 5.5 1.76v-3.76A5.52 5.52 0 0 1 24.5 9Z" fill="#fe2c55"/>
+        <path d="M30 12.2v3.76a9.4 9.4 0 0 1-5.5-1.76v6.83a7.7 7.7 0 1 1-6.78-7.63v3.9a4 4 0 1 0 4 4.1V9h3.8a5.52 5.52 0 0 0 4.48 3.2Z" fill="#69c9d0" opacity="0.75"/>
+      </svg>
+      <span class="logo-text">Tiktok<em>Downloader</em></span>
+    </div>
+
+    <div class="input-group">
+      <div class="input-wrap">
+        <input
+          id="urlInput"
+          class="url-input"
+          type="url"
+          placeholder="Вставьте ссылку на TikTok видео…"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button class="paste-btn" id="pasteBtn" title="Вставить из буфера">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="9" y="2" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Вставить
+        </button>
+      </div>
+      <button class="dl-btn" id="dlBtn">
+        <span class="btn-text">Скачать</span>
+        <span class="spinner" id="spinner"></span>
+      </button>
+    </div>
+
+    <p class="error-msg" id="errorMsg"></p>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-inner">
+        <div class="thumb-wrap" id="thumbWrap">
+          <div class="thumb-placeholder">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+          </div>
+        </div>
+        <div class="result-meta">
+          <div class="result-title" id="resultTitle">—</div>
+          <div class="result-author" id="resultAuthor">@username</div>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="act-btn act-video" id="videoBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="2" y="3" width="15" height="14" rx="2"/>
+            <polygon points="22 7 17 12 22 17 22 7" fill="currentColor" stroke="none"/>
+          </svg>
+          <span id="videoBtnText">Скачать видео</span>
+          <span class="btn-spinner" id="videoSpinner"></span>
+        </button>
+        <button class="act-btn act-audio" id="audioBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M9 18V5l12-2v13"/>
+            <circle cx="6" cy="18" r="3"/>
+            <circle cx="18" cy="16" r="3"/>
+          </svg>
+          <span id="audioBtnText">Скачать звук</span>
+          <span class="btn-spinner" id="audioSpinner"></span>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    Только для личного использования · Уважайте авторов контента
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
